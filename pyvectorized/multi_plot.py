@@ -4,72 +4,95 @@ Operate on many plots at once
 2013 (BSD-3) California Institute of Technology
 """
 from __future__ import division
-import numpy as np
+from warnings import warn
+from itertools import izip_longest
 
-def newax(*varargin):
-    nargin = len(varargin)
-    if nargin > 0:
-        fig = varargin[0]
-    if nargin > 1:
-        subplot_number = varargin[1]
-    if nargin > 2:
-        mode = varargin[2]
+import numpy as np
+from matplotlib import pyplot as plt
+from mpl_toolkits.mplot3d import axes3d
+
+#from mayavi import mlab
+
+def newax(subplots=(1,1), fig=None,
+          mode='list', dim=2):
     """Create (possibly multiple) new axes handles.
     
-    usage
-        [ax, fig] = newax
-        ax = newax(fig, subplot_number)
-       
-    input
-        fig = figure object handle
-        subplot_number = either number of subplots, or [1 x 2] matrix of
-                         subplot layout
-        mode = ['matrix'] | 'vec'
+    @param fig: attach axes to this figure
+    @type fig: figure object,
+        should be consistent with C{dim}
     
-    output
-        ax = handles of axes objects, either vector or matrix,
-             depending on 'mode' above
-        fig = parent figure handle
+    @param subplots: number or layout of subplots
+    @type subplots: int or
+        2-tuple of subplot layout
+    
+    @param mode: return the axes shaped as a
+        vector or as a matrix.
+        This is a convenience for later iterations
+        over the axes.
+    @type mode: 'matrix' | ['list']
+    
+    @param dim: plot dimension:
+        
+            - if dim == 2, then use matplotlib
+            - if dim == 3, then use mayavi
+        
+        So the figure type depends on dim.
+    
+    @return: C{(ax, fig)} where:
+        - C{ax}: axes created
+        - C{fig}: parent of ax
+    @rtype: list or list of lists,
+        depending on C{mode} above
     
     see also
         axes
     """
+    # layout or number of axes ?
+    try:
+        subplot_layout = tuple(subplots)
+    except:
+        subplot_layout = (1, subplots)
+    
+    # reasonable layout ?
+    if len(subplot_layout) != 2:
+        raise Exception('newax:' +
+            'subplot layout should be 2-tuple or int.')
+    
     # which figure ?
-    if nargin < 1:
-        fig = figure
-    else:
-        if (0 in fig.shape):
-            fig = figure
-    # how many subplots ?
-    if nargin < 2:
-        subplot_number = 1
-    if nargin < 3:
-        mode = 'matrix'
+    if fig is None:
+        fig = plt.figure()
+    
+    # create subplot(s)
+    (nv, nh) = subplot_layout
+    n = np.prod(subplot_layout)
+    
+    try:
+        dim = tuple(dim)
+    except:
+        # all same dim
+        dim = [dim] *n
+    
+    # matplotlib (2D) or mayavi (3D) ?
+    ax = []
+    for (i, curdim) in enumerate(dim):
+        if curdim == 2:
+            curax = fig.add_subplot(nv, nh, i+1)
+            ax.append(curax)
+        else:
+            curax = fig.add_subplot(nv, nh, i+1, projection='3d')
+            ax.append(curax)
+                      
+        if curdim > 3:
+            warn('ndim > 3, but plot limited to 3.')
+    
+    if mode is 'matrix':
+        ax = list(grouper(nh, ax) )
+    
     # single axes ?
-    if isscalar(subplot_number) and (subplot_number == 1):
-        ax = axes('Parent', fig)
-        return ax, fig
-    # layout specified ?
-    if not  isscalar(subplot_number):
-        subplot_layout = subplot_number
-        subplot_number = prod(subplot_number)
-    else:
-        subplot_layout = np.array([1, subplot_number]).reshape(1, -1)
-    # layout reasonable ?
-    if subplot_layout.shape[0] != 1:
-        error('newax:layout', 'Subplot layout should be a [1 x 2] matrix.')
-    # create multiple subplots
-    nv = subplot_layout[0, 0]
-    nh = subplot_layout[0, 1]
-    ax = nan(1, subplot_number)
-    for i in range(1, (subplot_number +1)):
-        ax[0, (i -1)] = subplot(nv, nh, i, 'Parent', fig)
-    if mode == 'matrix' == 1:
-        ax = reshape(ax, nv, nh)
-    else:
-        if mode == 'linear' != 1:
-            error('Unknown mode')
-    return ax, fig
+    if subplot_layout == (1,1):
+        ax = ax[0]
+    
+    return (ax, fig)
 
 def mhold(*varargin):
     nargin = len(varargin)
@@ -220,3 +243,9 @@ def axiseq(*varargin):
     for i in range(1, (ax.shape[1] +1)):
         axis(ax[0, (i -1)], 'equal')
     return
+
+def grouper(n, iterable, fillvalue=None):
+    """grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx
+    """
+    args = [iter(iterable)] * n
+    return izip_longest(fillvalue=fillvalue, *args)

@@ -3,9 +3,12 @@ Python vectorized numerical module
 
 2013 (BSD-3) California Institute of Technology
 """
+from __future__ import division
 from warnings import warn
 
 import numpy as np
+
+from multi_plot import grouper
 
 def unitize(x, ord=None, axis=0):
     """Return unit vectors corresponding to columns of x.
@@ -41,7 +44,7 @@ def dom2vec(domain, resolution):
     
     example
     -------
-    >>> domain = [[0, 1], [0,2]]
+    >>> domain = [0, 1, 0,2]
     >>> resolution = [4, 5]
     >>> q = domain2vec(domain, resolution)
     
@@ -56,6 +59,7 @@ def dom2vec(domain, resolution):
         
     See also vec2meshgrid, domain2meshgrid, meshgrid2vec.
     """
+    domain = grouper(2, domain)
     lambda_linspace = lambda (dom, res): np.linspace(dom[0], dom[1], res)
     axis_grids = map(lambda_linspace, zip(domain, resolution) )
     pnt_coor = np.meshgrid(*axis_grids)
@@ -192,45 +196,33 @@ def scalar2meshgrid(f,X):
     f=reshape(f,X.shape)
     return f
 
-def vec2meshgrid(*varargin):
+def vec2meshgrid(vectors, resolution=None, X=None):
     """Reshape matrix of column vectors to meshgrid component matrices.
     
     Reshape column vectors to size of X component matrices
-       [varargout] = VEC2MESHGRID(v, X) reshapes the matrix of N-D column
-       vectors v to N 2D matrices, each of size(X), for use as arguments of
-       grid points to SURF or QUIVER, or as vector components to QUIVER.
-       Each of the resulting N matrices is a component of the column vectors
-       in v.
+    reshapes the matrix of N-D column
+    vectors v to N 2D matrices, each of size(X), for use as arguments of
+    grid points to SURF or QUIVER, or as vector components to QUIVER.
+    Each of the resulting N matrices is a component of the column vectors in v.
     
-     input
-       v = matrix of column vectors
-         = [#dim x #vectors]
+    @param v: matrix of column vectors
+    @type v: [#dim x #vectors]
+
+    @param X: matrix of x coordinates of meshgrid points
+    @type X: [M1 x M2 x ... x MN]
     
-       X = matrix of x coordinates of meshgrid points
-         = [M1 x M2 x ... x MN]
-    
-     output
-       [v1, v2, ..., vN] = vectors' component matrices with size(X)
-         = [M1 x M2 x ... x MN]
+    @return: [v1, v2, ..., vN] = vectors' component matrices with size(X)
+    @rtype: [M1 x M2 x ... x MN]
     
     see also
         domain2vec, scalar2meshgrid, meshgrid2vec, domain2meshgrid
     """
-    nargin = len(varargin)
-    if nargin > 0:
-        v = varargin[0]
-    if nargin > 1:
-        X = varargin[1]
-    if nargin > 2:
-        resolution = varargin[2]
-    if nargin < 3:
-        resolution=X.shape
-    ndim=v.shape[0]
-    varargout=cell(1,ndim)
-    for i in range(1,(ndim+1)):
-        f=v[(i-1),:]
-        varargout[0,(i-1)]=reshape(f,resolution)
-    return varargout
+    if resolution is None:
+        resolution = X.shape
+    
+    XYZ = [np.reshape(row, resolution) for row in vectors]
+    
+    return np.array(XYZ)
 
 def res2meshsize(resolution):
     """Convert resolution [nx, ny, nz] to meshgrid matrix
@@ -239,21 +231,18 @@ def res2meshsize(resolution):
     see also
         vsurf, polar_domain2vec, plot_mapping
     """
-    if resolution.shape[1] < 3:
-        resolution=fliplr(resolution)
+    if len(resolution) < 3:
+        resolution = list(reversed(resolution) )
+    elif resolution[2] == 1:
+        resolution = resolution[:2]
+        resolution = list(reversed(resolution) )
+    elif resolution[0] == 1:
+        resolution = resolution[1:]
+    elif resolution[1] == 1:
+        resolution = resolution[[0,2]]
     else:
-        if resolution[0,2] == 1:
-            resolution=resolution[0,(1-1):2]
-            resolution=fliplr(resolution)
-        else:
-            if resolution[0,0] == 1:
-                resolution=resolution[0,(2-1):3]
-            else:
-                if resolution[0,1] == 1:
-                    resolution = resolution[0,(np.array([1,3]).reshape(1,-1)-1)]
-                else:
-                    warn('vmeshgrid:resolution' +
-                        '3d resolution for 2d surface.')
+        warn('vmeshgrid:resolution' +
+            '3d resolution for 2d surface.')
     return resolution
 
 def meshgrid2vec(x, y, z=None):

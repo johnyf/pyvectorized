@@ -4,9 +4,12 @@ Common 2D and 3D plot, quiver, text functions
 2013 (BSD-3) California Institute of Technology
 """
 from __future__ import division
-import numpy as np
+from warnings import warn
 
-def plotmd(ax, x, varargin):
+import numpy as np
+from matplotlib import pyplot as plt
+
+def plotmd(x, ax=None, **kwargs):
     """Plot column of matrix as points.
     
     PLOTMD(AX, X, VARARGIN) plots the points in matrix X in the axes with
@@ -16,62 +19,68 @@ def plotmd(ax, x, varargin):
     usage
         h = plotmd(ax, x, varargin)
     
-    input
-        ax = axes object handle(s)
-           = [1 x #axes] (to plot the same thing in all the axes provided)
-           = nan (to turn off plotting)
-           = [] (no plotting, with warning)
-        x = matrix of points to plot
-          = [#dim x #pnts]
-        varargin = plot formatting
+    @param x: matrix of points to plot
+    @type x: [#dim x #pnts] numpy.ndarray
     
-    output
-        h = handle to plotted object(s)
+    @param ax: axes object handle(s)
+           = [1 x #axes] (to plot the same thing in all the axes provided)
+           = numpy.NaN (to turn off plotting)
+           else no plotting and warning
+    @param args: plot formatting
+    
+    @return h: handle to plotted object(s)
     
     usage example: plot 10 random 3D points
-    >>> ax = gca;
+    >>> import numpy as np
+    >>> from matplotlib import pyplot as plt
+    >>> from pyvectorized import plotmd
+    >>> ax = plt.gca();
     >>> ndim = 3;
     >>> npoints = 10;
-    >>> x = rand(ndim, npoints);
+    >>> x = np.rand(ndim, npoints);
     >>> h = plotmd(ax, x, 'ro');
     
     see also
-        plot, plot3d
+        matplotlib.pyploy.plot, plot3d
     """
-    # avoid premature return issues
-    if nargout == 1:
-        varargout[0, 0] = nan
     # ax empty ?
-    if (0 in ax.shape):
-        warning('plotmd:ax', 'Axes handle ax is empty. No graphical output.')
-        return varargout
+    if not ax:
+        warn('plotmd: ' +
+             'empty ax, no plotting.')
+        return None
+    
     # no plotting output (silent)
-    if isnan(ax):
-        #disp('Axes handle is nan. No graphical output.')
-        return varargout
+    if ax is np.NaN:
+        print('Axes handle is nan. No graphical output.')
+        return None
+    
     # >3D ?
-    ndim = x.shape[0]
-    if ndim > 3:
-        warning('plotmd:ndim', '#dimensions > 3, plotting only 3D component.')
+    if x.ndim > 3:
+        warn('plotmd: ndim = ' +str(x.ndim) +
+             ' > 3, plotting only 3D component.')
+    
     # copy to multiple axes ?
-    if ax.shape[1] > 1:
-        nax = ax.shape[1]
-        for i in range(1, (nax +1)):
-            curax = ax[0, (i -1)]
-            plotmd(curax, x, varargin[:])
-        return varargout
+    try:
+        lines = []
+        for curax in ax:
+            line = plotmd(x, ax=curax, **kwargs)
+            lines.append(line)
+        return lines
+    except:
+        pass
+    
     # select 2D or 3D
-    if ndim == 1:
-        h = plot(ax, range(1, (x.shape[1] +1)), x[0, :], varargin[:])
-    else:
-        if ndim == 2:
-            h = plot(ax, x[0, :], x[1, :], varargin[:])
-        else:
-            if ndim >= 3:
-                h = plot3(ax, x[0, :], x[1, :], x[2, :], varargin[:])
-    if nargout == 1:
-        varargout[0, 0] = h
-    return varargout
+    dim = x.shape[0]
+    if dim == 1:
+        #n = x.shape[1]
+        #range(n) +1
+        line = ax.plot(x[0, :], **kwargs)
+    elif dim == 2:
+        line = ax.plot(x[0, :], x[1, :], **kwargs)
+    elif dim >= 3:
+        line = ax.plot(x[0, :], x[1, :], x[2, :], **kwargs)
+    
+    return line
 
 def quivermd(ax, x, v, varargin):
     """Multi-dimensional quiver.
