@@ -18,7 +18,7 @@ Moreover, code resembles more the associated math.
 
 For example, now one can say:
 
-```
+```python
 import numpy as np
 from pyvectorized import newax, plotmd, vsurf
 
@@ -31,7 +31,7 @@ plotmd(q, ax=ax)
 
 and
 
-```
+```python
 domain = [0, 1, 0, 2]
 resolution = [20, 30]
 
@@ -44,7 +44,7 @@ vsurf(q, f, resolution, ax=ax)
 
 Compare the above with the usual `matplotlib` approach:
 
-```
+```python
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -57,7 +57,7 @@ plt.plot(q[1,:], q[2,:], ax=ax)
 
 and
 
-```
+```python
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 
