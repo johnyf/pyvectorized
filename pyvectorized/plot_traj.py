@@ -6,34 +6,13 @@ Vectorized plotting of multiple trajectories at once
 from __future__ import division
 import numpy as np
 
-def plot_trajectory(*varargin):
-    nargin = len(varargin)
-    if nargin > 0:
-        ax = varargin[0]
-    if nargin > 1:
-        xtraj = varargin[1]
-    if nargin > 2:
-        x0 = varargin[2]
-    if nargin > 3:
-        xd = varargin[3]
-    if nargin > 4:
-        x0str = varargin[4]
-    if nargin > 5:
-        xdstr = varargin[5]
-    if nargin > 6:
-        xtraj_style = varargin[6]
-    if nargin > 7:
-        x0_style = varargin[7]
-    if nargin > 8:
-        xd_style = varargin[8]
-    if nargin > 9:
-        n_subsample = varargin[9]
+from multidim_plot import text
+
+def plot_trajectory(
+    ax, xtraj, x0=np.array([]), xd, x0str, xdstr,
+    xtraj_style, x0_style, xd_style, n_subsample
+):
     """Plot trajectory, initial condition and desired destination.
-    
-     usage
-       PLOT_TRAJECTORY(ax, xtraj)
-       PLOT_TRAJECTORY(ax, xtraj, x0, xd, x0str, xdstr,...
-                           xtraj_style, x0_style, xd_style, n_subsample)
     
      input
        ax = axes object handle
@@ -50,13 +29,13 @@ def plot_trajectory(*varargin):
              = string
        xdstr = destination text annotation ['$x_0$']
              = string
-       xtraj_style = trajectory style for plotmd function, for example:
+       xtraj_style = trajectory style for plot function, for example:
                    = {'g-o'}
                    = {'Color', 'g', 'Marker', 'o', 'LineStyle', '-'}
-       x0_style = initial point style for plotmd function, for example:
+       x0_style = initial point style for plot function, for example:
                 = {'rs'}
                 = {'Color', 'r', 'Marker', 's'}
-       xd_style = destination point style for plotmd function, for example:
+       xd_style = destination point style for plot function, for example:
                 = {'go'}
                 = {'Color', 'g', 'Marker', 'o'}
        n_subsample = use at most this number of points per trajectory
@@ -70,7 +49,7 @@ def plot_trajectory(*varargin):
         plot_path, test_plot_traj
     
     depends
-       plotmd, textmd, takehold, restorehold, subsample
+       plot, text, takehold, restorehold, subsample
      todo
        update code of: nf_spline_plot_results, nf_spline_plot_results_md, plotq0qsqd
        to use this for multiple trajectories
@@ -128,17 +107,17 @@ def plot_trajectory(*varargin):
     xfinal = cell2mat(xfinal)
     #
     # plot
-    plotmd(ax, xt, xtraj_style[:])
+    plot(ax, xt, xtraj_style[:])
     # trajectory
     # note
     #   no HandleVisibility off needed, since concatenated into single line object
-    plotmd(ax, x0, x0_style[:])
+    plot(ax, x0, x0_style[:])
     # initial condition
-    plotmd(ax, xfinal, 'Color', 'b', 'Marker', 'o', 'LineStyle', 'None', 'HandleVisibility', 'off')
+    plot(ax, xfinal, 'Color', 'b', 'Marker', 'o', 'LineStyle', 'None', 'HandleVisibility', 'off')
     # actual final point
     # no destination ?
     if not  (0 in xd.shape):
-        plotmd(ax, xd, xd_style[:])
+        plot(ax, xd, xd_style[:])
         # desired destination
     # annotate only single initial condition and desired destination
     if not  (0 in xd.shape):
@@ -148,14 +127,13 @@ def plot_trajectory(*varargin):
     # not nice result to annotate all initial conditions
     #annot_x0_xd(ax, x0, x0str, xd, xdstr)
     restorehold(ax, held)
-    return
 
 def annot_x0_xd(ax, x0, x0str, xd, xdstr):
     # annotate initial conditions
     n0 = x0.shape[1]
     for i in range(1, (n0 +1)):
         curx0 = x0[:, (i -1)]
-        textmd(1.1 * curx0, x0str, 'Interpreter', 'Latex', 'FontSize', 15, 'Parent', ax)
+        text(1.1 * curx0, x0str, 'Interpreter', 'Latex', 'FontSize', 15, 'Parent', ax)
     # no destination ?
     if (0 in xd.shape):
         return
@@ -163,58 +141,33 @@ def annot_x0_xd(ax, x0, x0str, xd, xdstr):
     nd = xd.shape[1]
     for i in range(1, (nd +1)):
         curxd = xd[:, (i -1)]
-        textmd(1.1 * curxd, xdstr, 'Interpreter', 'Latex', 'FontSize', 15, 'Parent', ax)
+        text(1.1 * curxd, xdstr, 'Interpreter', 'Latex', 'FontSize', 15, 'Parent', ax)
     nnotate('desired', 'destinations')
     nd = xd.shape[1]
     for i in range(1, (nd +1)):
         curxd = xd[:, (i -1)]
-        textmd(1.1 * curxd, xdstr, 'Interpreter', 'Latex', 'FontSize', 15, 'Parent', ax)
+        text(1.1 * curxd, xdstr, 'Interpreter', 'Latex', 'FontSize', 15, 'Parent', ax)
     nnotate('desired', 'destinations')
     nd = xd.shape[1]
     for i in range(1, (nd +1)):
         curxd = xd[:, (i -1)]
-        textmd(1.1 * curxd, xdstr, 'Interpreter', 'Latex', 'FontSize', 15, 'Parent', ax)
+        text(1.1 * curxd, xdstr, 'Interpreter', 'Latex', 'FontSize', 15, 'Parent', ax)
     nd
     nnotate('desired', 'destinations')
     nd = xd.shape[1]
     for i in range(1, (nd +1)):
         curxd = xd[:, (i -1)]
-        textmd(1.1 * curxd, xdstr, 'Interpreter', 'Latex', 'FontSize', 15, 'Parent', ax)
+        text(1.1 * curxd, xdstr, 'Interpreter', 'Latex', 'FontSize', 15, 'Parent', ax)
     return
 
-def plot_path(*varargin):
-    nargin = len(varargin)
-    if nargin > 0:
-        ax = varargin[0]
-    if nargin > 1:
-        x0 = varargin[1]
-    if nargin > 2:
-        xtraj = varargin[2]
-    if nargin > 3:
-        xd = varargin[3]
-    if nargin > 4:
-        x0str = varargin[4]
-    if nargin > 5:
-        xdstr = varargin[5]
-    if nargin > 6:
-        zoff = varargin[6]
-    if nargin > 7:
-        zonsurf = varargin[7]
-    if nargin > 8:
-        Rs = varargin[8]
-    if nargin > 9:
-        xtraj_style = varargin[9]
-    if nargin > 10:
-        x0_style = varargin[10]
-    if nargin > 11:
-        xd_style = varargin[11]
-    if nargin > 12:
-        xtraj_onsurf_style = varargin[12]
+def plot_path(
+    ax, x0, xtraj, xd, x0str='',
+    xdstr='', zoff=None, zonsurf=None, Rs=None,
+    xtraj_style=None, x0_style=None,
+    xd_style=None,
+    xtraj_onsurf_style=None
+):
     """Plot trajectory on function surface.
-    
-     usage
-       PLOT_PATH(ax, x0, xtraj, xd)
-       PLOT_PATH(ax, x0, xtraj, xd, x0str, xdstr, zoff, zonsurf, Rs)
     
      input
        ax = axes object handle
@@ -227,7 +180,8 @@ def plot_path(*varargin):
              = string
        zoff = the contour plot level z offset
             = real | []
-       zonsurf = navigation function values at corresponding points
+       zonsurf = navigation function values at
+                   corresponding points
                = [1 x size(xtraj, 2) ] | []
        Rs = sensing radius
           > 0 | []
@@ -236,41 +190,31 @@ def plot_path(*varargin):
         plot_trajectory
     """
     # depends
-    #   plotmd, zoffset, plot_trajectory, plot_circle, plotSphere
-    #
-    # input
-    if nargin < 9:
-        Rs = np.array([])
-    if nargin < 8:
-        zonsurf = np.array([])
-    if nargin < 7:
-        zoff = np.array([])
-    if nargin < 6:
-        xdstr = ''
-    if nargin < 5:
-        x0str = ''
-    if nargin < 10:
+    #   plot, zoffset, plot_trajectory,
+    #   plot_circle, plotSphere
+    
+    if xtraj_style is None:
         xtraj_style = ['Linewidth', 2, 'Color', 'r', 'Linestyle', '-']
-    else:
-        if (0 in xtraj_style.shape):
+    elif (0 in xtraj_style.shape):
             xtraj_style = ['Linewidth', 2, 'Color', 'r', 'Linestyle', '-']
-    if nargin < 11:
+    
+    if x0_style is None:
         x0_style = ['Color', 'r', 'Marker', 's']
-    else:
-        if (0 in x0_style.shape):
+    elif (0 in x0_style.shape):
             x0_style = ['Color', 'r', 'Marker', 's']
+    
     if nargin < 12:
         xd_style = ['Color', 'g', 'Marker', 'o']
-    else:
-        if (0 in xd_style.shape):
+    elif (0 in xd_style.shape):
             xd_style = ['Color', 'g', 'Marker', 'o']
-    if nargin < 13:
+    
+    if xtraj_onsurf_style is None:
         xtraj_onsurf_style = ['Linewidth', 3, 'Color', 'm', 'Linestyle', '-']
-    else:
-        if (0 in xtraj_onsurf_style.shape):
+    elif (0 in xtraj_onsurf_style.shape):
             xtraj_onsurf_style = ['Linewidth', 3, 'Color', 'm', 'Linestyle', '-']
+    
     ndim = x0.shape[0]
-    #
+    
     # plot
     held = takehold(ax)
     if ndim == 2:
@@ -282,9 +226,9 @@ def plot_path(*varargin):
         # 3D path (imagined on field surface)
         if not  (0 in zonsurf.shape):
             xonsurf = zoffset(xtraj, zonsurf)
-            plotmd(ax, xonsurf, xtraj_onsurf_style[:])
+            plot(ax, xonsurf, xtraj_onsurf_style[:])
     plot_trajectory(ax, xtraj, x0, xd, x0str, xdstr, xtraj_style, x0_style, xd_style)
-    #
+    
     # sensing on ?
     if not  (0 in Rs.shape):
         if ndim == 2:
@@ -295,13 +239,9 @@ def plot_path(*varargin):
             else:
                 error('Path plot only available for 2 and 3 dimensions.')
     restorehold(ax, held)
-    return
 
 def qtraj_mat2cell(qtraj):
     """Convert 3d matrix of trajectories to row cell array of 2d matrices
-    
-     usage
-       qtraj = qtraj_mat2cell(qtraj)
     
      input
        qtraj = 3d matrix of trajectories
@@ -334,7 +274,7 @@ def test_plot_traj():
     see also
         plot_trajectory
     """
-    ax = gca
+    ax = plt.gca()
     ndim = 3
     ntraj = 10
     npnt = 1000
@@ -351,4 +291,3 @@ def test_plot_traj():
     plot_trajectory(ax, x0, xtraj, xd, x0str, xdstr, xtraj_style, x0_style, xd_style)
     plot_scalings(ax, 0)
     grid(ax, 'on')
-    return

@@ -4,13 +4,15 @@ Vectorized surf, contour and quiver
 2013 (BSD-3) California Institute of Technology
 """
 from __future__ import division
+from warnings import warn
 
 import numpy as np
 from matplotlib import pyplot as plt
 #from mayavi import mlab
 
 from multi_plot import newax
-from vectorized_meshgrid import vec2meshgrid, res2meshsize
+from vectorized_meshgrid import domain2vec, vec2meshgrid, res2meshsize
+from multidim_plot import quiver
 
 def ezquiver(
     func,
@@ -19,7 +21,10 @@ def ezquiver(
     ax = None,
     *args, **kwargs
 ):
-    """Vectorized quivermd for functions with vector args.
+    """Vectorized quiver for functions with vector args.
+    
+    see also
+        vezsurf, vezcontour, ezsurf, surf
     
     @param func: function handle
     @param domain: rectangular plotting domain
@@ -29,39 +34,30 @@ def ezquiver(
     @param ax: axes object handle
     @param args: positional arguments forwarded to func
     @param kwargs: key-value args for func
-    
-    see also
-        vezsurf, vezcontour, ezsurf, surf
     """
     if ax is None:
         ax = newax()
     
     q = domain2vec(domain, resolution)
-    v = feval(func, q, varargin[:])
-    quivermd(ax, q, v)
-    return
+    v = feval(func, q, **kwargs)
+    quiver(ax, q, v)
 
-def vcontour(ax, q, z, resolution, varargin):
+def vcontour(ax, q, z, resolution, **kwargs):
     """Vectorized wrapper for contour plot.
-    
-    usage
-        h = VCONTOUR(ax, q, z, resolution, varargin)
-    
-    input
-        ax = axes object handle
-        q = coordinates of surface points
-          = [2 x #points] |
-        z = row vector of height data for surface points
-          = [1 x #points]
-        resolution = resolution of surface
-                   = [nx, ny]
-        varargin = passed to contour function as given, see its help
-     
-    output
-        h = handle to contourgroup object created.
     
     see also
         contour, vsurf, vec2meshgrid
+    
+    @param ax: axes object handle
+    @param q: coordinates of surface points
+      = [2 x #points] |
+    @param z: row vector of height data for surface points
+      = [1 x #points]
+    @param resolution: resolution of surface
+    @type resolution: [nx, ny]
+    @param kwargs: passed to contour function as given, see its help
+     
+    @return: h = handle to contourgroup object created.
     """
     # depends
     #   vec2meshgrid, res2meshsize
@@ -69,151 +65,122 @@ def vcontour(ax, q, z, resolution, varargin):
     # input
     # axes handle missing ?
     if (0 in ax.shape):
-        ax = gca
+        ax = plt.gca()
     resolution = res2meshsize(resolution)
     # Z ?
     if (0 in z.shape):
         z = np.zeros(1, q.shape[1])
     else:
         if isnan(z):
-            z = 5 * rand(1, q.shape[1])
+            z = 5 * np.random.rand(1, q.shape[1])
             # random surface
         else:
             if isscalar(z):
-                z = z * ones(1, q.shape[1])
-    #
+                z = z * np.ones(1, q.shape[1])
+    
     # calc
     ndim = q.shape[0]
     if ndim < 3:
-        h = vcontour2(ax, q, z, resolution, varargin[:])
+        h = vcontour2(ax, q, z, resolution, **kwargs)
     else:
-        error('vcontour:ndim', 'Dimension of vector q is not 2.')
-    if nargout < 1:
-        clear('h')
+        raise Exception('vcontour:ndim', 'Dimension of vector q is not 2.')
     return h
 
 def vcontour2(ax, q, z, res, varargin):
     X, Y = vec2meshgrid(q, np.array([]), res) # nargout=2
     Z = vec2meshgrid(z, np.array([]), res)
-    h = contour(ax, X, Y, Z, varargin[:])
+    h = plt.contour(ax, X, Y, Z, varargin[:])
     return h
 
-def vcontourf(ax, q, z, resolution, varargin):
+def vcontourf(ax, q, z, resolution, **kwargs):
     """Vectorized filled contour plot.
     
-    usage
-        h = VCONTOURF(ax, q, z, resolution, varargin)
+    @param ax: axes object handle
     
-    input
-        ax = axes object handle
-        q = coordinates of surface points
-          = [2 x #points] |
-        z = row vector of height data for surface points
-          = [1 x #points]
-        resolution = resolution of surface
-                   = [nx, ny]
+    @param q: coordinates of surface points
+    @type q: [2 x #points] |
     
-    output
-        h = handle to filled contourgroup object created.
+    @param z: row vector of height data for surface points
+    @type z: [1 x #points]
+    
+    @param resolution: resolution of surface
+    @type resolution: [nx, ny]
+    
+    @return: h = handle to filled contourgroup
+        object created.
     
     see also
-        VCONTOUR, VSURF, VEC2MESHGRID
+        vcontour, vsurf, vec2meshgrid
     
     depends
         vcontour
     """
-    h = vcontour(ax, q, z, resolution, 'Fill', 'on', varargin[:])
-    if nargout < 1:
-        clear('h')
+    h = vcontour(ax, q, z, resolution, 'Fill', 'on',
+                 **kwargs)
     return h
 
-def vezcontour(*varargin):
-    nargin = len(varargin)
-    if nargin > 0:
-        ax = varargin[0]
-    if nargin > 1:
-        func = varargin[1]
-    if nargin > 2:
-        domain = varargin[2]
-    if nargin > 3:
-        resolution = varargin[3]
-    if nargin > 4:
-        values = varargin[4]
-    if nargin > 5:
-        varargin = varargin[5]
+def vezcontour(func, ax, domain, resolution,
+               values, **kwargs):
     """Vectorized easy contour,
     for functions accepting vector arguments.
     
-    usage
-        VEZCONTOUR(ax, func)
-        VEZCONTOUR(ax, func, domain)
-        VEZCONTOUR(ax, func, domain, resolution)
-        VEZCONTOUR(ax, func, domain, resolution, values)
-        VEZCONTOUR(ax, func, domain, resolution, values, varargin)
-     
-    input
-        ax = axes object handle
-        func = function handle
+    @param ax: axes object handle
+    @param func: function handle
     
-    optional input
-        domain = rectangular plotting domain
-               = [xmin, xmax, ymin, ymax]
-        resolution = grid spacing
-                   = [nx, ny]
-        values = level set values
-               = [v1, v2, ..., vN]
-        varargin = additional arguments for input to func
+    @param domain: rectangular plotting domain
+    @type domain: [xmin, xmax, ymin, ymax]
+    
+    @param resolution: grid spacing
+    @type resolution: [nx, ny]
+    
+    @param values: level set values
+    @type values: [v1, v2, ..., vN]
+    
+    @param kwargs: additional arguments for
+        input to func
     
     see also
         vezsurf, ezcontour, contour
     """
     # which axes ?
     if (0 in ax.shape):
-        warning('vezcontour:axes', 'Axes object handle ax is empty, no plot.')
+        warn('vezcontour:axes',
+                'Axes object handle ax is empty, no plot.')
         return
+    
     # which domain ?
-    if nargin < 3:
+    if not domain:
         domain = np.array([0, 1, 0, 1]).reshape(1, -1)
+    
     # at what grid resolution ?
-    if nargin < 4:
+    if not resolution:
         resolution = np.array([30, 29]).reshape(1, -1)
     else:
         if (0 in resolution.shape):
             resolution = np.array([30, 29]).reshape(1, -1)
+    
     # which level sets ?
-    if nargin < 5:
+    if not values:
         values = np.array([])
+    
     # compute surface
     q, X, Y = domain2vec(domain, resolution) # nargout=3
-    f = feval(func, q, varargin[:])
+    f = feval(func, q, **kwargs)
     Z = vec2meshgrid(f, X)
+    
     # default level set values ?
     if (0 in values.shape):
-        contour(ax, X, Y, Z)
+        plt.contour(ax, X, Y, Z)
     else:
-        contour(ax, X, Y, Z, values)
+        plt.contour(ax, X, Y, Z, values)
     return
 
-def vezsurf(*varargin):
-    nargin = len(varargin)
-    if nargin > 0:
-        ax = varargin[0]
-    if nargin > 1:
-        func = varargin[1]
-    if nargin > 2:
-        domain = varargin[2]
-    if nargin > 3:
-        resolution = varargin[3]
-    if nargin > 4:
-        varargin = varargin[4]
+def vezsurf(func, domain, resolution, ax, **kwargs):
     """Vectorized ezsurf,
     for functions accepting vector arguments.
     
-     usage
-       VEZSURF(ax, func)
-       VEZSURF(ax, func, domain)
-       VEZSURF(ax, func, domain, resolution)
-       [q, f] = VEZSURF(ax, func, domain, resolution, varargin)
+    see also
+        vezcontour, ezsurf, fplot
     
     input
        ax = axes object handle
@@ -226,22 +193,19 @@ def vezsurf(*varargin):
                   = [nx, ny]
        varargin = additional arguments for input to func
     
-     output
-       q = domain points
-       f = function values at q
-    
-    see also
-        VEZCONTOUR, EZSURF, FPLOT, SURF
+    @return (q, f) where:
+        - q = domain points
+        - f = function values at q
     """
     # which axes ?
     if (0 in ax.shape):
-        warning('vezsurf:axes', 'Axes object handle ax is empty, no plot.')
+        warn('vezsurf:axes', 'Axes object handle ax is empty, no plot.')
         return varargout
     # which domain ?
-    if nargin < 3:
+    if not domain:
         domain = np.array([0, 1, 0, 1]).reshape(1, -1)
     # at what grid resolution ?
-    if nargin < 4:
+    if not resolution:
         resolution = np.array([30, 29]).reshape(1, -1)
     else:
         if (0 in resolution.shape):
@@ -261,6 +225,9 @@ def vsurf(q, z, resolution,
     Vectorized wrapper for the surf function.
     When q is 2-dimensional, then z is the height function.
     When q is 3-dimensional, then z is the color function of the surface.
+    
+    see also
+        mpl.plot_surface, vcontour, vec2meshgrid
     
     @param ax: axes object handle
     @param q: coordinates of surface points
@@ -289,9 +256,6 @@ def vsurf(q, z, resolution,
     @type resolution: [nx, ny] | [nx, ny, nz]
     
     @return: surface object created.
-    
-    see also
-        mpl.plot_surface, vcontour, vec2meshgrid
     """
     # depends
     #   vec2meshgrid, res2meshsize
@@ -305,7 +269,7 @@ def vsurf(q, z, resolution,
         for curax in ax:
             surf = vsurf(curax, q, z, resolution, **kwargs)
             surfaces.append(surf)
-        return h
+        return surf
     except:
         pass
     
