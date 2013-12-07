@@ -9,7 +9,7 @@ from itertools import izip_longest
 
 import numpy as np
 from matplotlib import pyplot as plt
-from mpl_toolkits.mplot3d import axes3d
+#from mpl_toolkits.mplot3d import axes3d
 
 #from mayavi import mlab
 
@@ -220,7 +220,7 @@ def gridhold(*varargin):
         mgrid, mview
     """
     if nargin < 1:
-        ax = gca
+        ax = plt.gca()
     for i in range(1, (max(ax.shape) +1)):
         grid(ax[(i -1)], 'on')
         hold(ax[(i -1)], 'on')
@@ -239,7 +239,7 @@ def axiseq(*varargin):
        ax = axes object handle
     """
     if nargin < 1:
-        ax = gca
+        ax = plt.gca()
     for i in range(1, (ax.shape[1] +1)):
         axis(ax[0, (i -1)], 'equal')
     return
@@ -249,3 +249,12 @@ def grouper(n, iterable, fillvalue=None):
     """
     args = [iter(iterable)] * n
     return izip_longest(fillvalue=fillvalue, *args)
+
+def axis(ax, limits):
+    ax.set_xlim(limits[0:2])
+    ax.set_ylim(limits[2:4])
+    
+    if len(limits) == 4:
+        return
+    
+    ax.set_zlim(limits[4:6])

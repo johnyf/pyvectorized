@@ -2,7 +2,7 @@
 plotmd 2d, 3d
 """
 from pyvectorized import newax, dom2vec, \
-    plotmd, quivermd, textmd
+    plotmd, quivermd, textmd, axis
 import numpy as np
 
 x = np.arange(10)
@@ -63,9 +63,7 @@ x = np.array([[1, 1, 2]]).transpose()
 textmd(x, 'azvndhv', ax[1])
 
 limits = [0, 2, 0, 2, 1, 3]
-ax[1].set_xlim(0, 2)
-ax[1].set_ylim(0, 2)
-ax[1].set_zlim(1, 3)
+axis(ax[1], limits)
 
 # uncomment these if outside ipython
 #from matplotlib import pylab as plt

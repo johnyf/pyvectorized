@@ -10,7 +10,7 @@ instead of coordinates separated into matrices.
 """
 __version__ = "0.1"
 
-from multi_plot import newax
+from multi_plot import newax, axis
 from vectorized_meshgrid import dom2vec
 from multidim_plot import plotmd, quivermd, textmd
 from vectorized_plot import vsurf
