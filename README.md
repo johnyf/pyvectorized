@@ -20,13 +20,13 @@ For example, now one can say:
 
 ```python
 import numpy as np
-from pyvectorized import newax, plotmd, vsurf
+from pyvectorized import newax, plot, vsurf
 
 ax = newax()
 
 q = np.array([[1,3,2,4], [5,3,4,1]])
 
-plotmd(q, ax=ax)
+plot(q, ax=ax)
 ```
 
 and
@@ -48,7 +48,7 @@ Compare the above with the usual `matplotlib` approach:
 import numpy as np
 from matplotlib import pyplot as plt
 
-ax = newax()
+ax = plt.gca()
 
 q = np.array([[1,3,2,4], [5,3,4,1]])
 
@@ -78,7 +78,7 @@ What happens if `myfun` is defined in any dimension ?
 ### Features
 
 #### Plotting
-- `plotmd`, `quivermd`, `textmd` for common 2D and 3D calls, no name headaches with calls, clean multi-dim lib
+- `plot`, `quiver`, `text` for common 2D and 3D calls, no name headaches with calls, clean multi-dim lib
 - `vsurf`, `vcontour`, `vcontourf` and `vezsurf`, `vezcontour`, `ezquiver` for vectorized surf, contour plots using a matrix of column vectors (points) and its mesh size
 - `plot_subsample` functions to reduce the number of curve markers, w/o reducing curve fidelity, this aims to avoid huge image files that lead to `PDF` file sizes rejected when uploading to conference servers
 - vectorized `grid`, `hold`, `cla`, `view` for managing multiple axes at once

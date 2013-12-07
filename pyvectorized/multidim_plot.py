@@ -21,7 +21,7 @@ def dimension(ndarray):
         return ndarray.ndim
     return ndarray.shape[0]
 
-def plotmd(x, ax=None, **kwargs):
+def plot(x, ax=None, **kwargs):
     """Plot column of matrix as points.
     
     Plot points in matrix x in axes ax
@@ -31,12 +31,12 @@ def plotmd(x, ax=None, **kwargs):
     
     >>> import numpy as np
     >>> from matplotlib import pyplot as plt
-    >>> from pyvectorized import plotmd
+    >>> from pyvectorized import plot
     >>> ax = plt.gca();
     >>> ndim = 3;
     >>> npoints = 10;
     >>> x = np.rand(ndim, npoints);
-    >>> h = plotmd(ax, x, 'ro');
+    >>> h = plot(ax, x, 'ro');
     
     see also
         matplotlib.pyploy.plot, plot3d
@@ -54,7 +54,7 @@ def plotmd(x, ax=None, **kwargs):
     """
     # copy to multiple axes ?
     try:
-        lines = [plotmd(x, i, **kwargs) for i in ax]
+        lines = [plot(x, i, **kwargs) for i in ax]
         return lines
     except:
         pass
@@ -66,7 +66,7 @@ def plotmd(x, ax=None, **kwargs):
     
     # >3D ?
     if dim > 3:
-        warn('plotmd: ndim = ' +str(x.ndim) +
+        warn('plot: ndim = ' +str(x.ndim) +
              ' > 3, plotting only 3D component.')
     
     # select 2D or 3D
@@ -81,7 +81,7 @@ def plotmd(x, ax=None, **kwargs):
     
     return line
 
-def quivermd(x, v, ax=None, **kwargs):
+def quiver(x, v, ax=None, **kwargs):
     """Multi-dimensional quiver.
     
     Plot v columns at points in columns of x
@@ -89,13 +89,13 @@ def quivermd(x, v, ax=None, **kwargs):
     
     >>> import numpy as np
     >>> import matplotlib as mpl
-    >>> from pyvectorized import quivermd, dom2vec
+    >>> from pyvectorized import quiver, dom2vec
     >>> x = dom2vec([0, 10, 0, 11], [20, 20])
     >>> v = np.vstack(np.sin(x[1, :] ), np.cos(x[2, :] ) )
-    >>> quivermd(mpl.gca(), x, v)
+    >>> quiver(mpl.gca(), x, v)
     
     see also
-        plotmd, matplotlib.quiver, mayavi.quiver3
+        plot, matplotlib.quiver, mayavi.quiver3
     
     @param x: points where vectors are based
         each column is a coordinate tuple
@@ -118,7 +118,7 @@ def quivermd(x, v, ax=None, **kwargs):
     """
     # multiple axes ?
     try:
-        fields = [quivermd(x, v, i, **kwargs) for i in ax]
+        fields = [quiver(x, v, i, **kwargs) for i in ax]
         return fields
     except:
         pass
@@ -145,12 +145,12 @@ def quivermd(x, v, ax=None, **kwargs):
                      v[0, :], v[1, :], v[2, :], **kwargs)
     
     if dim > 3:
-        warn('quivermd:ndim #dimensions > 3,' +
+        warn('quiver:ndim #dimensions > 3,' +
              'plotting only 3D component.')
     
     return h
 
-def textmd(x, string, ax=None, **kwargs):
+def text(x, string, ax=None, **kwargs):
     """Text annotation in 2D or 3D.
     
     text position x:
@@ -162,7 +162,7 @@ def textmd(x, string, ax=None, **kwargs):
             - [n x #points]: nd plot
     
     see also
-        plotmd, quivermd,
+        plot, quiver,
         matplotlibpyplot.text,
         mpl_toolkits.mplot3d.Axes3D.text
     
@@ -173,7 +173,7 @@ def textmd(x, string, ax=None, **kwargs):
     """
     # multiple axes ?
     try:
-        h = [textmd(x, string, ax=i, **kwargs) for i in ax]
+        h = [text(x, string, ax=i, **kwargs) for i in ax]
     except:
         pass
     
@@ -194,11 +194,11 @@ def textmd(x, string, ax=None, **kwargs):
     
     return h
 
-def vtextmd(q, num=None, ax=None, **kwargs):
+def vtext(q, num=None, ax=None, **kwargs):
     """Label points in q with numbers from num.
     
     see also
-        textmd, text, plotmd
+        text, plot
     
     @param ax: axes object handle | []
     
@@ -220,4 +220,4 @@ def vtextmd(q, num=None, ax=None, **kwargs):
     
     # plot
     strings = str(num.T)
-    textmd(q, strings, axes=ax, **kwargs)
+    text(q, strings, axes=ax, **kwargs)

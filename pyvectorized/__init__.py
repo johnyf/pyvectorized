@@ -12,5 +12,5 @@ __version__ = "0.1"
 
 from multi_plot import newax, axis
 from vectorized_meshgrid import dom2vec
-from multidim_plot import plotmd, quivermd, textmd
+from multidim_plot import plot, quiver, text
 from vectorized_plot import vsurf
