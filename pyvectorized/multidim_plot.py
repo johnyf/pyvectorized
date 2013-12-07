@@ -9,28 +9,26 @@ from warnings import warn
 import numpy as np
 from matplotlib import pyplot as plt
 
+def dimension(ndarray):
+    """dimension of ndarray
+    
+    - ndim == 1:
+        dimension = 1
+    - ndim == 2:
+        dimension = shape[0]
+    """
+    if ndarray.ndim < 2:
+        return ndarray.ndim
+    return ndarray.shape[0]
+
 def plotmd(x, ax=None, **kwargs):
     """Plot column of matrix as points.
     
-    PLOTMD(AX, X, VARARGIN) plots the points in matrix X in the axes with
-    handle AX using the plot formatting options in VARARGIN. X must be
-    a matrix whose columns are the 2D or 3D vectors to plot.
-    
-    usage
-        h = plotmd(ax, x, varargin)
-    
-    @param x: matrix of points to plot
-    @type x: [#dim x #pnts] numpy.ndarray
-    
-    @param ax: axes object handle(s)
-           = [1 x #axes] (to plot the same thing in all the axes provided)
-           = numpy.NaN (to turn off plotting)
-           else no plotting and warning
-    @param args: plot formatting
-    
-    @return h: handle to plotted object(s)
+    Plot points in matrix x in axes ax
+    passing kwargs to matplotlib.plot.
     
     usage example: plot 10 random 3D points
+    
     >>> import numpy as np
     >>> from matplotlib import pyplot as plt
     >>> from pyvectorized import plotmd
@@ -42,196 +40,184 @@ def plotmd(x, ax=None, **kwargs):
     
     see also
         matplotlib.pyploy.plot, plot3d
+    
+    @param x: matrix of points to plot
+    @type x: [#dim x #pnts] numpy.ndarray
+    
+    @param ax: axes object handle(s)
+    @type ax: [1 x #axes] (same plot in each axes pair)
+        | numpy.NaN (to turn off plotting)
+        | else no plotting and warning
+    @param args: plot formatting
+    
+    @return h: handle to plotted object(s)
     """
-    # ax empty ?
-    if not ax:
-        warn('plotmd: ' +
-             'empty ax, no plotting.')
-        return None
-    
-    # no plotting output (silent)
-    if ax is np.NaN:
-        print('Axes handle is nan. No graphical output.')
-        return None
-    
-    # >3D ?
-    if x.ndim > 3:
-        warn('plotmd: ndim = ' +str(x.ndim) +
-             ' > 3, plotting only 3D component.')
-    
     # copy to multiple axes ?
     try:
-        lines = []
-        for curax in ax:
-            line = plotmd(x, ax=curax, **kwargs)
-            lines.append(line)
+        lines = [plotmd(x, i, **kwargs) for i in ax]
         return lines
     except:
         pass
     
+    if not ax:
+        ax = plt.gca()
+    
+    dim = dimension(x)
+    
+    # >3D ?
+    if dim > 3:
+        warn('plotmd: ndim = ' +str(x.ndim) +
+             ' > 3, plotting only 3D component.')
+    
     # select 2D or 3D
-    dim = x.shape[0]
-    if dim == 1:
-        #n = x.shape[1]
-        #range(n) +1
-        line = ax.plot(x[0, :], **kwargs)
-    elif dim == 2:
+    if dim < 1:
+        raise Exception('x.ndim == 0')
+    elif dim < 2:
+        line = ax.plot(x, **kwargs)
+    elif dim < 3:
         line = ax.plot(x[0, :], x[1, :], **kwargs)
-    elif dim >= 3:
+    else:
         line = ax.plot(x[0, :], x[1, :], x[2, :], **kwargs)
     
     return line
 
-def quivermd(ax, x, v, varargin):
+def quivermd(x, v, ax=None, **kwargs):
     """Multi-dimensional quiver.
     
-    QUIVERMD(AX, X, V, VARARGIN) plots the column vectors in matrix V
-    at the points with coordinates the column vectors in matrix X
-    within axes object AX using plot formatting options in VARARGIN.
+    Plot v columns at points in columns of x
+    in axes ax with plot formatting options in kwargs.
     
-    usage
-        H = QUIVERMD(AX, X, V, VARARGIN)
-    
-    input
-        ax = axes handle (e.g. ax = gca)
-        x = matrix of points where vectors are plotted
-          = [#dim x #points]
-        v = matrix of column vectors to plot at points x
-          = [#dim x #points]
-        varargin = plot formatting
-    
-    output
-        h = handle to plotted object(s)
-    
-    example
-        x = linspace(0, 10, 20);
-        y = linspace(0, 10, 20);
-        [X, Y] = meshgrid(x, y);
-        x = [X(:), Y(:) ].';
-        v = [sin(x(1, :) ); cos(x(2, :) ) ];
-        quivermd(gca, x, v)
+    >>> import numpy as np
+    >>> import matplotlib as mpl
+    >>> from pyvectorized import quivermd, dom2vec
+    >>> x = dom2vec([0, 10, 0, 11], [20, 20])
+    >>> v = np.vstack(np.sin(x[1, :] ), np.cos(x[2, :] ) )
+    >>> quivermd(mpl.gca(), x, v)
     
     see also
-        plotmd, quiver, quiver3
+        plotmd, matplotlib.quiver, mayavi.quiver3
+    
+    @param x: points where vectors are based
+        each column is a coordinate tuple
+    @type x: 2d lil | numpy.ndarray
+    
+    @param v: vectors which to base at points x
+    @type v: 2d lil | numpy.ndarray
+    
+    @param ax: axes handle, e.g., ax = gca())
+    
+    @param x: matrix of points where vectors are plotted
+    @type x: [#dim x #points]
+    
+    @param v: matrix of column vectors to plot at points x
+    @type v: [#dim x #points]
+    
+    @param kwargs: plot formatting
+    
+    @return: handle to plotted object(s)
     """
     # multiple axes ?
-    nax = ax.shape[1]
-    if nax > 1:
-        for i in range(1, (nax +1)):
-            curax = ax[0, (i -1)]
-            quivermd(curax, x, v, varargin[:])
-        return varargout
-    ndim = x.shape[0]
-    if ndim > 3:
-        warning('quivermd:ndim', '#dimensions > 3, plotting only 3D component.')
-    if ndim == 2:
-        h = quiver(ax, x[0, :], x[1, :], v[0, :], v[1, :], varargin[:])
+    try:
+        fields = [quivermd(x, v, i, **kwargs) for i in ax]
+        return fields
+    except:
+        pass
+    
+    if not ax:
+        ax = plt.gca()
+    
+    dim = dimension(x)
+    
+    if dim < 2:
+        raise Exception('ndim < 2')
+    elif dim < 3:
+        h = ax.quiver(x[0, :], x[1, :],
+                      v[0, :], v[1, :], **kwargs)
     else:
-        if ndim >= 3:
-            h = quiver3(ax, x[0, :], x[1, :], x[2, :], v[0, :], v[1, :], v[2, :], varargin[:])
-    if nargout == 1:
-        varargout[0, 0] = h
-    return varargout
+        raise NotImplementedError
+        
+        from mayavi.mlab import quiver3d
+        
+        if ax:
+            print('axes arg ignored, mayavi used')
+        
+        h = quiver3d(x[0, :], x[1, :], x[2, :],
+                     v[0, :], v[1, :], v[2, :], **kwargs)
+    
+    if dim > 3:
+        warn('quivermd:ndim #dimensions > 3,' +
+             'plotting only 3D component.')
+    
+    return h
 
-def textmd(x, str_, varargin):
+def textmd(x, string, ax=None, **kwargs):
     """Text annotation in 2D or 3D.
     
-    usage
-        TEXTMD(x, str, varargin)
-    
-    input
-        x = point where text is placed
-          = [#dim x 1]
-        str = annotation text string
-     
-    see also
-        plotmd, quivermd
-    """
-    if any('Parent' == varargin):
-        idx = np.flatnonzero('Parent' == varargin)
-        ax = varargin[(idx -1), (+ 1 -1)]
-        nax = ax.shape[1]
-    else:
-        nax = 1
-    if nax > 1:
-        for i in range(1, (nax +1)):
-            curax = ax[0, (i -1)]
-            v = varargin
-            v[(idx + 1 -1)] = curax
-            textmd(x, str_, v[:])
-        return varargout
-    ndim = x.shape[0]
-    if ndim == 2:
-        y = x[1, :]
-        x = x[0, :]
-        h = text(x, y, str_, varargin[:])
-    else:
-        if ndim == 3:
-            z = x[2, :]
-            y = x[1, :]
-            x = x[0, :]
-            h = text(x, y, z, str_, varargin[:])
-    if nargout == 1:
-        varargout[0, 0] = h
-    return varargout
-
-def textmd2(ax, x, string, varargin):
-    """textmd wrapper compatible with 
-    
-    usage
-       textmd2(ax, x, string, varargin)
-    
-    input
-        ax = axes object handle
-        x = coordinates of string position, see text
-        string = text annotation
-        varargin = directly passed to text
+    text position x:
+        - x.ndim == 1: single point:
+            - 2-tuple: 2d plot
+            - n-tuple: nd plot
+        - x.ndim > 1: each column a point:
+            - [2 x #points]: 2D plot
+            - [n x #points]: nd plot
     
     see also
-        textmd, text
+        plotmd, quivermd,
+        matplotlibpyplot.text,
+        mpl_toolkits.mplot3d.Axes3D.text
+    
+    @param x: point where text is placed
+    @type x: [#dim x 1]
+    
+    @param str: annotation text string
     """
-    textmd(x, string, 'Parent', ax, varargin[:])
-    return
+    # multiple axes ?
+    try:
+        h = [textmd(x, string, ax=i, **kwargs) for i in ax]
+    except:
+        pass
+    
+    if not ax:
+        ax = plt.gca()
+    
+    dim = dimension(x)
+    if dim < 2:
+        raise Exception('ndim < 2')
+    elif dim < 3:
+        h = ax.text(x[0, :], x[1, :], string, **kwargs)
+    else:
+        if dim > 3:
+            print('>3 dimensions, only first 3 plotted')
+        
+        h = ax.text(x[0, :], x[1, :], x[2, :],
+                    string, **kwargs)
+    
+    return h
 
-def vtextmd(*varargin):
-    nargin = len(varargin)
-    if nargin > 0:
-        ax = varargin[0]
-    if nargin > 1:
-        q = varargin[1]
-    if nargin > 2:
-        num = varargin[2]
-    if nargin > 3:
-        varargin = varargin[3]
-    """Add numbers as text to multiple 2/3D points.
-    
-    VTEXTMD(ax, q, num) adds the numbers in the numeric array num as text
-    labels to the points with position vectors the columns of q.
-    
-    usage
-        vtextmd(ax, q)
-        vtextmd(ax, q, num, varargin)
-    
-    input
-        ax = axes object handle | []
-        q = point coordinates
-          = [#dim x #points]
-    
-    optional input
-        num = array of numbers to use for annotation
-            = [1 x #points]
-        varargin = additional arguments passed to text
+def vtextmd(q, num=None, ax=None, **kwargs):
+    """Label points in q with numbers from num.
     
     see also
         textmd, text, plotmd
+    
+    @param ax: axes object handle | []
+    
+    @param q: matrix whose each column stores point coordinates
+    @type q: [#dim x #points]
+    
+    @param num: array of numbers to use for annotation
+    @type num: [1 x #points]
+    
+    @param kwargs: additional arguments passed to text
     """
     # axes ?
-    if (0 in ax.shape):
-        ax = gca
+    if not ax:
+        ax = plt.gca()
+    
     # numbers ?
-    if nargin < 3:
+    if not num:
         num = range(1, (q.shape[1] +1))
+    
     # plot
-    str_ = num2str(num.T)
-    textmd(q, str_, 'Parent', ax, varargin[:])
-    return
+    strings = str(num.T)
+    textmd(q, strings, axes=ax, **kwargs)

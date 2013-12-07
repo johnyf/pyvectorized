@@ -1,7 +1,8 @@
 """
-plotmd example
+plotmd 2d, 3d
 """
-from pyvectorized import newax, plotmd
+from pyvectorized import newax, dom2vec, \
+    plotmd, quivermd, textmd
 import numpy as np
 
 x = np.arange(10)
@@ -15,6 +16,56 @@ ax, fig = newax(2, dim=[2,3])
 
 plotmd(q2, ax[0])
 plotmd(q, ax[1])
+
+"""
+quivermd 2d
+"""
+dom = [-10, 10, -10, 10]
+res = [10, 10]
+
+x = dom2vec(dom, res)
+A = np.array([[1, -2],
+              [2, 1] ])
+v = A.dot(x)
+
+ax, fig = newax()
+quivermd(x, v, ax)
+
+"""
+quiver 3d
+"""
+dom = [-1, 1, -1, 1, -1, 1]
+res = [5, 5, 5]
+
+x = dom2vec(dom, res)
+A = np.array([[1, -2, 3],
+              [2, 1, 4],
+              [9, 3, -3] ])
+v = A.dot(x)
+
+#quivermd(x, v)
+
+"""
+texmd 2d
+"""
+ax, fig = newax(2, dim=[2, 3])
+
+x = np.array([[1, 1]]).transpose()
+textmd(x, 'azvndhv', ax[0])
+
+limits = [0.5, 2, 0.5, 1.5]
+ax[0].axis(limits)
+
+"""
+textmd 3d
+"""
+x = np.array([[1, 1, 2]]).transpose()
+textmd(x, 'azvndhv', ax[1])
+
+limits = [0, 2, 0, 2, 1, 3]
+ax[1].set_xlim(0, 2)
+ax[1].set_ylim(0, 2)
+ax[1].set_zlim(1, 3)
 
 # uncomment these if outside ipython
 #from matplotlib import pylab as plt
