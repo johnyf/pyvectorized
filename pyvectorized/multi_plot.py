@@ -9,7 +9,7 @@ from itertools import izip_longest
 
 import numpy as np
 from matplotlib import pyplot as plt
-#from mpl_toolkits.mplot3d import axes3d
+from mpl_toolkits.mplot3d import axes3d
 
 #from mayavi import mlab
 
