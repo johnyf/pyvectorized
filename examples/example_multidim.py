@@ -2,7 +2,7 @@
 plot 2d, 3d
 """
 from pyvectorized import newax, dom2vec, \
-    plot, quiver, text, axis
+    plot, quiver, text, streamplot, axis
 import numpy as np
 
 x = np.arange(10)
@@ -30,6 +30,9 @@ v = A.dot(x)
 
 ax, fig = newax()
 quiver(x, v, ax)
+
+streamplot(x, v, res, ax,
+           density=1, color='red')
 
 """
 quiver 3d

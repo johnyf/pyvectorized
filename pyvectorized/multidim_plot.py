@@ -6,8 +6,10 @@ Common 2D and 3D plot, quiver, text functions
 from __future__ import division
 from warnings import warn
 
-import numpy as np
+#import numpy as np
 from matplotlib import pyplot as plt
+
+from vectorized_meshgrid import vec2meshgrid
 
 def dimension(ndarray):
     """dimension of ndarray
@@ -221,3 +223,25 @@ def vtext(q, num=None, ax=None, **kwargs):
     # plot
     strings = str(num.T)
     text(q, strings, axes=ax, **kwargs)
+
+def streamplot(x, v, res, ax, **kwargs):
+    """Streamplot in 2d or 3d.
+    
+    @param x: points
+    @type x: 2d array, each column a point
+    
+    @param v: vectors based at points in x
+    @type v: 2d array, each column a vector
+    
+    @param ax: axes
+    @param kwargs: passed to mpl streamplot
+    """
+    dim = dimension(x)
+    
+    if dim == 2:
+        (X, Y) = vec2meshgrid(x, res)
+        (U, V) = vec2meshgrid(v, res)
+        ax.streamplot(X[0, :], Y[:, 1],
+                      U, V, **kwargs)
+    else:
+        raise NotImplementedError
