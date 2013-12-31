@@ -203,46 +203,38 @@ def mcla(ax, varargin):
         cla(ax[0, (i -1)], varargin[:])
     return
 
-def gridhold(*varargin):
-    nargin = len(varargin)
-    if nargin > 0:
-        ax = varargin[0]
+def gridhold(ax):
     """Grid and hold on for multiple axes handles.
     
-     usage
-       GRIDHOLD(ax)
-    
-     input
-       ax = vector of axes object handles
-          = [1 x #axes]
+    @param ax: single | list of axes
     
     see also
+    --------
         mgrid, mview
     """
-    if nargin < 1:
-        ax = plt.gca()
-    for i in range(1, (max(ax.shape) +1)):
-        grid(ax[(i -1)], 'on')
-        hold(ax[(i -1)], 'on')
-    return
+    ax = _check_ax(ax)
+    
+    # single ax ?
+    try:
+        ax.grid(True)
+        ax.hold(True)
+    except:
+        [i.grid(True) for i in ax]
+        [i.hold(True) for i in ax]
 
 def axeq(ax=None):
     """Wrapper for ax.axis('equal').
     
     @param ax: single | list of axes
     """
-    if ax is None:
-        ax = plt.gca()
+    ax = _check_ax(ax)
     
     # single ax ?
     try:
         ax.axis('equal')
         return
     except:
-        pass
-    
-    for curax in ax:
-        curax.axis('equal')
+        [i.axis('equal') for i in ax]
 
 def grouper(n, iterable, fillvalue=None):
     """grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx
@@ -258,3 +250,10 @@ def axis(ax, limits):
         return
     
     ax.set_zlim(limits[4:6])
+
+def _check_ax(ax):
+    """Helper
+    """
+    if ax is None:
+        return plt.gca()
+    return ax
