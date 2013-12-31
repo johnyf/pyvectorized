@@ -101,22 +101,26 @@ def cla(ax=None):
     [i.cla() for i in ax]
 
 def axis(ax, limits):
-    ax.set_xlim(limits[0:2])
-    ax.set_ylim(limits[2:4])
+    ax = _check_ax(ax)
+    
+    [i.set_xlim(limits[0:2]) for i in ax]
+    [i.set_ylim(limits[2:4]) for i in ax]
     
     if len(limits) <= 4:
         return
     
-    ax.set_zlim(limits[4:6])
+    [i.set_zlim(limits[4:6]) for i in ax]
 
-def axeq(ax=None):
-    """Wrapper for ax.axis('equal').
+def axeq(ax=None, v='scaled'):
+    """Wrapper for ax.axis.
     
     @param ax: if None use gca
     @type ax: single | list of axes
+    
+    @param v: see mpl.pyplot.axis
     """
     ax = _check_ax(ax)
-    [i.axis('equal') for i in ax]
+    [i.axis(v) for i in ax]
 
 def hold(ax, b=True):
     """Set hold state of axes.
@@ -173,8 +177,6 @@ def _grouper(n, iterable, fillvalue=None):
     """
     args = [iter(iterable)] * n
     return izip_longest(fillvalue=fillvalue, *args)
-
-
 
 def _check_ax(ax):
     """Helper
