@@ -84,3 +84,5 @@ Icon?
 #
 *.egg-info
 .DS_Store
+./todo.md
+./convert/*
