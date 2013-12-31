@@ -42,11 +42,11 @@ def ezquiver(
     v = feval(func, q, **kwargs)
     quiver(ax, q, v)
 
-def vcontour(ax, q, z, resolution, **kwargs):
+def contour(ax, q, z, resolution, **kwargs):
     """Vectorized wrapper for contour plot.
     
     see also
-        contour, vsurf, vec2meshgrid
+        vsurf, vec2meshgrid
     
     @param ax: axes object handle
     @param q: coordinates of surface points
@@ -92,7 +92,7 @@ def vcontour2(ax, q, z, res, varargin):
     h = plt.contour(ax, X, Y, Z, varargin[:])
     return h
 
-def vcontourf(ax, q, z, resolution, **kwargs):
+def contourf(ax, q, z, resolution, **kwargs):
     """Vectorized filled contour plot.
     
     @param ax: axes object handle
@@ -115,11 +115,11 @@ def vcontourf(ax, q, z, resolution, **kwargs):
     depends
         vcontour
     """
-    h = vcontour(ax, q, z, resolution, 'Fill', 'on',
+    h = contour(ax, q, z, resolution, 'Fill', 'on',
                  **kwargs)
     return h
 
-def vezcontour(func, ax, domain, resolution,
+def ezcontour(func, ax, domain, resolution,
                values, **kwargs):
     """Vectorized easy contour,
     for functions accepting vector arguments.
@@ -175,7 +175,7 @@ def vezcontour(func, ax, domain, resolution,
         plt.contour(ax, X, Y, Z, values)
     return
 
-def vezsurf(func, domain, resolution, ax, **kwargs):
+def ezsurf(func, domain, resolution, ax, **kwargs):
     """Vectorized ezsurf,
     for functions accepting vector arguments.
     
@@ -218,7 +218,7 @@ def vezsurf(func, domain, resolution, ax, **kwargs):
         varargout[0, 1] = f
     return varargout
 
-def vsurf(q, z, resolution,
+def surf(q, z, resolution,
           ax=None, **kwargs):
     """Vectorized surf.
     
@@ -292,19 +292,19 @@ def vsurf(q, z, resolution,
     
     # calc
     if ndim < 3:
-        surf = vsurf2(q, z, resolution, ax, **kwargs)
+        surf = surf2(q, z, resolution, ax, **kwargs)
     else:
-        surf = vsurf_color(q, z, resolution, ax, **kwargs)
+        surf = surf_color(q, z, resolution, ax, **kwargs)
     
     return surf
 
-def vsurf2(q, z, res, ax, **kwargs):
+def surf2(q, z, res, ax, **kwargs):
     X, Y = vec2meshgrid(q, res) # nargout=2
     Z, = vec2meshgrid(z, res)
     h = ax.plot_surface(X, Y, Z, **kwargs)
     return h
 
-def vsurf_color(q, c, res, ax, **kwargs):
+def surf_color(q, c, res, ax, **kwargs):
     X, Y, Z = vec2meshgrid(q, res) # nargout=3
     
     # no color ?

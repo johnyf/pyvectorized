@@ -94,7 +94,7 @@ def newax(subplots=(1,1), fig=None,
     
     return (ax, fig)
 
-def mhold(*varargin):
+def hold(*varargin):
     nargin = len(varargin)
     if nargin > 0:
         multiax = varargin[0]
@@ -151,7 +151,7 @@ def mhold(*varargin):
             hold(curax, curstate)
     return
 
-def mgrid(ax, varargin):
+def grid(ax, varargin):
     """Set grid for multiple axes.
     
      usage
@@ -178,7 +178,7 @@ def mgrid(ax, varargin):
         grid(ax[(i -1)], varargin[:])
     return
 
-def mview(ax, m):
+def view(ax, m):
     """Set view settings for multiple axes.
     
      usage
@@ -198,7 +198,7 @@ def mview(ax, m):
         view(curax, m)
     return
 
-def mcla(ax, varargin):
+def cla(ax, varargin):
     for i in range(1, (ax.shape[1] +1)):
         cla(ax[0, (i -1)], varargin[:])
     return
