@@ -44,16 +44,13 @@ def plot_trajectory(
     
      caution
        if subsampling, all trajectories should have same number of points
-    
-    see also
-        plot_path, test_plot_traj
-    
-    depends
-       plot, text, takehold, restorehold, subsample
-     todo
-       update code of: nf_spline_plot_results, nf_spline_plot_results_md, plotq0qsqd
-       to use this for multiple trajectories
     """
+    #depends
+    #   plot, text, takehold, restorehold, subsample
+    # todo
+    #   update code of: nf_spline_plot_results, nf_spline_plot_results_md, plotq0qsqd
+    #   to use this for multiple trajectories
+    
     # input
     # single traj ?
     if not  iscell(xtraj):
@@ -185,9 +182,6 @@ def plot_path(
                = [1 x size(xtraj, 2) ] | []
        Rs = sensing radius
           > 0 | []
-    
-    see also
-        plot_trajectory
     """
     # depends
     #   plot, zoffset, plot_trajectory,
@@ -257,11 +251,10 @@ def qtraj_mat2cell(qtraj):
        the flow, so all trajectories stop at the same number of iterations.
        Otherwise nan values could be used to signify the (different) end of
        each trajectory.
-    
-    todo
-       dev faster alternative for plotting/post-processing directly with 3d
-       matrices of trajectories
     """
+    #todo
+    #   dev faster alternative for plotting/post-processing directly with 3d
+    #   matrices of trajectories
     ndim, niter, ntraj = qtraj.shape # nargout=3
     qtraj = mat2cell(qtraj, ndim, niter, ones(1, ntraj))
     qtraj = squeeze(qtraj)
@@ -269,10 +262,7 @@ def qtraj_mat2cell(qtraj):
     return qtraj
 
 def test_plot_traj():
-    """test trajectory plotting code for multiple trajectories
-    
-    see also
-        plot_trajectory
+    """test trajectory plotting code for multiple trajectories.
     """
     ax = plt.gca()
     ndim = 3

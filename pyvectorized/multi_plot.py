@@ -43,9 +43,6 @@ def newax(subplots=(1,1), fig=None,
         - C{fig}: parent of ax
     @rtype: list or list of lists,
         depending on C{mode} above
-    
-    see also
-        axes
     """
     # layout or number of axes ?
     try:

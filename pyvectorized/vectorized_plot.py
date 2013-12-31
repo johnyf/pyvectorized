@@ -23,9 +23,6 @@ def ezquiver(
 ):
     """Vectorized quiver for functions with vector args.
     
-    see also
-        vezsurf, vezcontour, ezsurf, surf
-    
     @param func: function handle
     @param domain: rectangular plotting domain
                = [xmin, xmax, ymin, ymax]
@@ -46,7 +43,7 @@ def contour(ax, q, z, resolution, **kwargs):
     """Vectorized wrapper for contour plot.
     
     see also
-        vsurf, vec2meshgrid
+        vec2meshgrid
     
     @param ax: axes object handle
     @param q: coordinates of surface points
@@ -108,13 +105,9 @@ def contourf(ax, q, z, resolution, **kwargs):
     
     @return: h = handle to filled contourgroup
         object created.
-    
-    see also
-        vcontour, vsurf, vec2meshgrid
-    
-    depends
-        vcontour
     """
+    #depends
+    #    vcontour
     h = contour(ax, q, z, resolution, 'Fill', 'on',
                  **kwargs)
     return h
@@ -138,9 +131,6 @@ def ezcontour(func, ax, domain, resolution,
     
     @param kwargs: additional arguments for
         input to func
-    
-    see also
-        vezsurf, ezcontour, contour
     """
     # which axes ?
     if (0 in ax.shape):
@@ -178,9 +168,6 @@ def ezcontour(func, ax, domain, resolution,
 def ezsurf(func, domain, resolution, ax, **kwargs):
     """Vectorized ezsurf,
     for functions accepting vector arguments.
-    
-    see also
-        vezcontour, ezsurf, fplot
     
     input
        ax = axes object handle
@@ -227,7 +214,7 @@ def surf(q, z, resolution,
     When q is 3-dimensional, then z is the color function of the surface.
     
     see also
-        mpl.plot_surface, vcontour, vec2meshgrid
+        mpl.plot_surface, vec2meshgrid
     
     @param ax: axes object handle
     @param q: coordinates of surface points

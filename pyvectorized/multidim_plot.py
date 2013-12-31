@@ -40,9 +40,6 @@ def plot(x, ax=None, **kwargs):
     >>> x = np.rand(ndim, npoints);
     >>> h = plot(ax, x, 'ro');
     
-    see also
-        matplotlib.pyploy.plot, plot3d
-    
     @param x: matrix of points to plot
     @type x: [#dim x #pnts] numpy.ndarray
     
@@ -97,7 +94,7 @@ def quiver(x, v, ax=None, **kwargs):
     >>> quiver(mpl.gca(), x, v)
     
     see also
-        plot, matplotlib.quiver, mayavi.quiver3
+        matplotlib.quiver, mayavi.quiver3
     
     @param x: points where vectors are based
         each column is a coordinate tuple
@@ -164,8 +161,7 @@ def text(x, string, ax=None, **kwargs):
             - [n x #points]: nd plot
     
     see also
-        plot, quiver,
-        matplotlibpyplot.text,
+        matplotlib.pyplot.text,
         mpl_toolkits.mplot3d.Axes3D.text
     
     @param x: point where text is placed
@@ -198,9 +194,6 @@ def text(x, string, ax=None, **kwargs):
 
 def vtext(q, num=None, ax=None, **kwargs):
     """Label points in q with numbers from num.
-    
-    see also
-        text, plot
     
     @param ax: axes object handle | []
     

@@ -13,10 +13,6 @@ from multidim_plot import plot
 
 def parse_plot_style(style):
     """Helper
-    
-    see also
-        plot2_fewer_markers,
-        plot_fewer_markers
     """
     graph_color = 'b'
     marker_style = 'none'
@@ -51,11 +47,6 @@ def plot2_fewer_markers(
     marker_npnt=10, line_npnt=100, **kwargs
 ):
     """Same line, different number of markers.
-    
-    see also
-        plot_fewer_markers,
-        plot2_subsample,
-        plot_subsample
     
     @param ax: axes object handle
     @param x: abscissa vector
@@ -95,12 +86,6 @@ def plot2_fewer_markers(
 def plot2_subsample(x, y, ax, n=100, **kwargs):
     """Plot subsampled line. Subsampling metric: index.
     
-    see also
-        plot_subsample,
-        plot2_subsample_arclength,
-        plot2_fewer_markers,
-        plot_fewer_markers
-    
     @param ax: axes object handle where to plot
     @param x: point abscissas (as passed to plot)
     @param y: point ordinates (as passed to plot)
@@ -126,12 +111,6 @@ def plot2_subsample_arclength(
 ):
     """Subsample wrt arclength metric and plot curve.
     
-    see also
-        test_plot_subsample_arclength,
-        plot_subsample,
-        plot_fewer_markers,
-        plot2_fewer_markers
-    
     @param ax: axes object handle where to plot
     @param x: point abscissas (as passed to plot)
     @param y: point ordinates (as passed to plot)
@@ -156,11 +135,6 @@ def plot_fewer_markers(
     style, **kwargs
 ):
     """Same line, different number of markers.
-    
-    see also
-        plot_fewer_markers,
-        plot2_subsample,
-        plot_subsample
     
     @param ax: axes object handle
     @param x: abscissa vector
@@ -212,12 +186,6 @@ def plot_fewer_markers(
 def plot_subsample(x, n, ax, **kwargs):
     """Plot subsampled line. Subsampling metric: index.
     
-    see also
-        plot2_subsample,
-        plot_subsample_arclength,
-        plot_fewer_markers,
-        plot2_fewer_markers
-    
     @param ax: axes object handle where to plot
     @param x: point abscissas (as passed to plot)
     @param y: point ordinates (as passed to plot)
@@ -233,12 +201,6 @@ def plot_subsample(x, n, ax, **kwargs):
 
 def plot_subsample_arclength(x, n=100, ax, **kwargs):
     """Subsample wrt arclength metric & plot curve.
-    
-    see also
-        test_plot_subsample_arclength,
-        plot2_subsample,
-        plot_fewer_markers,
-        plot2_fewer_markers
     
     @param ax: axes object handle where to plot
     @param x: point abscissas (as passed to plot)
@@ -267,14 +229,6 @@ def subsample(x, ntotal=100, dim=2, metric='index'):
     and their distances are measured by the Frobenius norm), then provide it
     in argument 4 (in the example: metric = [1 x 1 x (k-1)] are the distances
     between successive elements along the 3rd dimension of x).
-    
-    see also 
-        plot2_subsample
-        plot_subsample
-        plot2_fewer_markers
-        plot_fewer_markers
-        plot2_trajectory
-        test_inversion_diffeo
     
     note
        if metric == 'arclength', then x = [#dim x #pnts]
@@ -364,11 +318,6 @@ def arclength_using_for(Li, Li_desired):
 
 def test_plot_subsample_arclength():
     """Visually compare plot, plot_subsample, plot_subsample_arclength.
-    
-    see also
-        subsample
-        plot2_subsample_arclength
-        plot_subsample_arclength
     """
     from math import exp
     
@@ -388,10 +337,6 @@ def test_plot_subsample_arclength():
 
 def example_plot_subsample():
     """example using plot_subsample, plot2_subsample
-    
-    see also
-        plot2_subsample,
-        plot_subsample
     """
     npnt = 1000
     n_sample = 10
