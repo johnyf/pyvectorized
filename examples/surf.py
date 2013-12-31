@@ -1,7 +1,7 @@
 """
 vsurf example
 """
-from pyvectorized import dom2vec, vsurf, newax
+from pyvectorized import dom2vec, surf, newax
 
 def myfun(x):
     return x[0,:]**2 +x[1,:]**3
@@ -14,7 +14,7 @@ q = dom2vec(domain, resolution)
 f = myfun(q)
 
 ax, fig = newax(1, dim=[3])
-vsurf(q, f, resolution, ax=ax)
+surf(q, f, resolution, ax=ax)
 
 # uncomment these if outside ipython
 #from matplotlib import pyplot as plt
