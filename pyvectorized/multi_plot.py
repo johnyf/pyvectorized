@@ -226,23 +226,23 @@ def gridhold(*varargin):
         hold(ax[(i -1)], 'on')
     return
 
-def axiseq(*varargin):
-    nargin = len(varargin)
-    if nargin > 0:
-        ax = varargin[0]
-    """Wrapper for axis(ax, 'equal') to avoid rewriting it.
+def axeq(ax=None):
+    """Wrapper for ax.axis('equal').
     
-    usage
-       AXISEQ(ax)
-    
-    input
-       ax = axes object handle
+    @param ax: single | list of axes
     """
-    if nargin < 1:
+    if ax is None:
         ax = plt.gca()
-    for i in range(1, (ax.shape[1] +1)):
-        axis(ax[0, (i -1)], 'equal')
-    return
+    
+    # single ax ?
+    try:
+        ax.axis('equal')
+        return
+    except:
+        pass
+    
+    for curax in ax:
+        curax.axis('equal')
 
 def grouper(n, iterable, fillvalue=None):
     """grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx
@@ -254,7 +254,7 @@ def axis(ax, limits):
     ax.set_xlim(limits[0:2])
     ax.set_ylim(limits[2:4])
     
-    if len(limits) == 4:
+    if len(limits) <= 4:
         return
     
     ax.set_zlim(limits[4:6])
