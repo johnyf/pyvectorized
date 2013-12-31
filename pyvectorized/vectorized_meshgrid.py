@@ -8,7 +8,7 @@ from warnings import warn
 
 import numpy as np
 
-from multi_plot import grouper
+from multi_plot import _grouper
 
 def unitize(x, ord=None, axis=0):
     """Return unit vectors corresponding to columns of x.
@@ -59,7 +59,7 @@ def dom2vec(domain, resolution):
         
     See also vec2meshgrid, domain2meshgrid, meshgrid2vec.
     """
-    domain = grouper(2, domain)
+    domain = _grouper(2, domain)
     lambda_linspace = lambda (dom, res): np.linspace(dom[0], dom[1], res)
     axis_grids = map(lambda_linspace, zip(domain, resolution) )
     pnt_coor = np.meshgrid(*axis_grids)
