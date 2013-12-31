@@ -94,147 +94,73 @@ def newax(subplots=(1,1), fig=None,
     
     return (ax, fig)
 
-def hold(*varargin):
-    nargin = len(varargin)
-    if nargin > 0:
-        multiax = varargin[0]
-    if nargin > 1:
-        onoff = varargin[1]
-    """MHOLD(multiax, onoff)  set hold state of multiple axes.
+def hold(ax, b=True):
+    """Set hold state of axes.
     
-       VHOLD(multiax, onoff) is a vectorized version of function hold.
-       It sets the states of multiple axes objects with handles in matrix 
-       multiax, to the states provided in onoff. Argument onoff can be a
-       single string, 'on' or 'off', setting all the axes to that hold state,
-       or a cell matrix of strings 'on', 'off', setting individual axes to
-       (possibly) different states. Note that in the second case, matrix
-       multiax and cell matrix onoff should have the same size, i.e.,
-       size(multiax) should equal size(onoff), if onoff is a cell matrix.
+    @param ax: if None use gca
+    @type ax: single | list of axes
     
-    usage
-        MHOLD(multiax, onoff)
+    @param b: set hold on
+        if single value, same for each ax
+        otherwise len(b) must equal len(ax)
+    @type b: bool
     
-    input
-        multiax = matrix of handles to axes objects
-                = [ax11, ax12, ..., ax1m;
-                   ax21, ax22, ..., ax2m;
-                   :     :     :    :
-                   axn1, axn2, ..., axnm];
-        onoff = hold states for axes objects with handles in array multiax
-              = 'on' (to set all axes objects hold states to 'on') |
-              = 'off' (to set all axes objects hold states to 'off') |
-              = {'on', 'off', 'off', ..., } (to set individual hold states)
-    
-    see also
-        hold
-    """
-    # axes handle provided ?
-    if nargin < 1:
-        multiax = gca
-    # desired hold state provided ?
-    if nargin < 2:
-        onoff = 'on'
-    n = multiax.shape[0]
-    m = multiax.shape[1]
-    if ischar(onoff):
-        state = repmat([onoff], n, m)
-    else:
-        if iscell(onoff):
-            s = onoff.shape
-            if not  np.array_equal(s, np.array([n, m]).reshape(1, -1)):
-                error('Matrix of axes handles "multiax" and of axes hold ' + 'states "onoff" have unequal sizes.')
-            state = onoff
-    for i in range(1, (n +1)):
-        for j in range(1, (m +1)):
-            curax = multiax[(i -1), (j -1)]
-            curstate = state[(i -1), (j -1)]
-            hold(curax, curstate)
-    return
-
-def grid(ax, varargin):
-    """Set grid for multiple axes.
-    
-     usage
-       MGRID(ax, varargin)
-    
-     input
-       ax = row vector of axes object handles
-          = [1 x #axes]
-       varargin = args passed to grid (same for each axis)
-                = 'on' | 'off' | anything valid for function grid.
-    
-     see also
-         mview, gridhold
-    
-     note
-       mfunc = multi-function, i.e., operates on multiple similar objects,
-               e.g. axes objects
-       vfunc = vectorised func, i.e., function which traditionally works with
-               matrices or iteratively and has been vectorized, either like
-               surf to work on vectors, or in the sense of parallelization.
-    """
-    n = max(ax.shape)
-    for i in range(1, (n +1)):
-        grid(ax[(i -1)], varargin[:])
-    return
-
-def view(ax, m):
-    """Set view settings for multiple axes.
-    
-     usage
-       MVIEW(ax, m)
-    
-     input
-       ax = multiple axes object handles
-          = [1 x #axes]
-       m = string
-    
-    see also
-        mgrid, gridhold
-    """
-    nax = ax.shape[1]
-    for i in range(1, (nax +1)):
-        curax = ax[0, (i -1)]
-        view(curax, m)
-    return
-
-def cla(ax, varargin):
-    for i in range(1, (ax.shape[1] +1)):
-        cla(ax[0, (i -1)], varargin[:])
-    return
-
-def gridhold(ax):
-    """Grid and hold on for multiple axes handles.
-    
-    @param ax: single | list of axes
-    
-    see also
-    --------
-        mgrid, mview
+    @param b: set grid on
+    @type b: bool
     """
     ax = _check_ax(ax)
     
-    # single ax ?
     try:
-        ax.grid(True)
-        ax.hold(True)
+        if not len(b) == len(ax):
+            raise Exception('pyvectorized.hold: ' +
+                'len(ax) != len(b)')
     except:
-        [i.grid(True) for i in ax]
-        [i.hold(True) for i in ax]
+        b = len(ax) *[b]
+    
+    [i.hold(s) for (i, s) in zip(ax, b)]
+
+def grid(ax=None, b=True, **kw):
+    """Set grid for multiple axes.
+    
+    @param ax: if None use gca
+    @type ax: single | list of axes
+    
+    @param b: set grid on
+    @type b: bool
+    """
+    ax = _check_ax(ax)
+    [i.grid(b, **kw) for i in ax]
+
+def cla(ax=None):
+    """Clear single or multiple axes.
+    
+    @param ax: if None use gca
+    @type ax: single | list of axes
+    """
+    ax = _check_ax(ax)
+    [i.cla() for i in ax]
+
+def gridhold(ax=None, b=True):
+    """Grid and hold on for multiple axes.
+    
+    @param ax: if None use gca
+    @type ax: single | list of axes
+    
+    @param b: set grid and hold on
+    @type b: bool
+    """
+    ax = _check_ax(ax)
+    [i.grid(b) for i in ax]
+    [i.hold(b) for i in ax]
 
 def axeq(ax=None):
     """Wrapper for ax.axis('equal').
     
-    @param ax: single | list of axes
+    @param ax: if None use gca
+    @type ax: single | list of axes
     """
     ax = _check_ax(ax)
-    
-    # single ax ?
-    try:
-        ax.axis('equal')
-        return
-    except:
-        [i.axis('equal') for i in ax]
+    [i.axis('equal') for i in ax]
 
 def grouper(n, iterable, fillvalue=None):
     """grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx
@@ -255,5 +181,11 @@ def _check_ax(ax):
     """Helper
     """
     if ax is None:
-        return plt.gca()
-    return ax
+        return [plt.gca()]
+    
+    # single ax ?
+    try:
+        len(ax)
+        return ax
+    except:
+        return [ax]
