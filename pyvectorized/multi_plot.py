@@ -83,13 +83,40 @@ def newax(subplots=(1,1), fig=None,
             warn('ndim > 3, but plot limited to 3.')
     
     if mode is 'matrix':
-        ax = list(grouper(nh, ax) )
+        ax = list(_grouper(nh, ax) )
     
     # single axes ?
     if subplot_layout == (1,1):
         ax = ax[0]
     
     return (ax, fig)
+
+def cla(ax=None):
+    """Clear single or multiple axes.
+    
+    @param ax: if None use gca
+    @type ax: single | list of axes
+    """
+    ax = _check_ax(ax)
+    [i.cla() for i in ax]
+
+def axis(ax, limits):
+    ax.set_xlim(limits[0:2])
+    ax.set_ylim(limits[2:4])
+    
+    if len(limits) <= 4:
+        return
+    
+    ax.set_zlim(limits[4:6])
+
+def axeq(ax=None):
+    """Wrapper for ax.axis('equal').
+    
+    @param ax: if None use gca
+    @type ax: single | list of axes
+    """
+    ax = _check_ax(ax)
+    [i.axis('equal') for i in ax]
 
 def hold(ax, b=True):
     """Set hold state of axes.
@@ -128,15 +155,6 @@ def grid(ax=None, b=True, **kw):
     ax = _check_ax(ax)
     [i.grid(b, **kw) for i in ax]
 
-def cla(ax=None):
-    """Clear single or multiple axes.
-    
-    @param ax: if None use gca
-    @type ax: single | list of axes
-    """
-    ax = _check_ax(ax)
-    [i.cla() for i in ax]
-
 def gridhold(ax=None, b=True):
     """Grid and hold on for multiple axes.
     
@@ -150,29 +168,13 @@ def gridhold(ax=None, b=True):
     [i.grid(b) for i in ax]
     [i.hold(b) for i in ax]
 
-def axeq(ax=None):
-    """Wrapper for ax.axis('equal').
-    
-    @param ax: if None use gca
-    @type ax: single | list of axes
-    """
-    ax = _check_ax(ax)
-    [i.axis('equal') for i in ax]
-
-def grouper(n, iterable, fillvalue=None):
+def _grouper(n, iterable, fillvalue=None):
     """grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx
     """
     args = [iter(iterable)] * n
     return izip_longest(fillvalue=fillvalue, *args)
 
-def axis(ax, limits):
-    ax.set_xlim(limits[0:2])
-    ax.set_ylim(limits[2:4])
-    
-    if len(limits) <= 4:
-        return
-    
-    ax.set_zlim(limits[4:6])
+
 
 def _check_ax(ax):
     """Helper
