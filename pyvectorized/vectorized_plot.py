@@ -96,12 +96,6 @@ def contour(q, z, res, ax=None, **kwargs):
     
     return cont
 
-def vcontour2(ax, q, z, res, varargin):
-    X, Y = vec2meshgrid(q, np.array([]), res) # nargout=2
-    Z = vec2meshgrid(z, np.array([]), res)
-    h = plt.contour(ax, X, Y, Z, varargin[:])
-    return h
-
 def contourf(ax, q, z, resolution, **kwargs):
     """Vectorized filled contour plot.
     
