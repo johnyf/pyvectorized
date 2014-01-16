@@ -253,9 +253,9 @@ def surf(q, z, resolution,
     try:
         surfaces = []
         for curax in ax:
-            surf = vsurf(curax, q, z, resolution, **kwargs)
-            surfaces.append(surf)
-        return surf
+            surface = surf(curax, q, z, resolution, **kwargs)
+            surfaces.append(surface)
+        return surfaces
     except:
         pass
     
@@ -278,11 +278,11 @@ def surf(q, z, resolution,
     
     # calc
     if ndim < 3:
-        surf = surf2(q, z, resolution, ax, **kwargs)
+        surface = surf2(q, z, resolution, ax, **kwargs)
     else:
-        surf = surf_color(q, z, resolution, ax, **kwargs)
+        surface = surf_color(q, z, resolution, ax, **kwargs)
     
-    return surf
+    return surface
 
 def surf2(q, z, res, ax, **kwargs):
     X, Y = vec2meshgrid(q, res) # nargout=2
