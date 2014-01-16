@@ -39,25 +39,24 @@ def ezquiver(
     v = feval(func, q, **kwargs)
     quiver(ax, q, v)
 
-def contour(ax, q, z, resolution, **kwargs):
+def contour(q, z, res, ax=None, **kwargs):
     """Vectorized wrapper for contour plot.
     
-    see also
-        vec2meshgrid
+    @param q: coordinates of surface points
+    @type q: [2 x #points]
+    
+    @param z: row vector of height data for surface points
+    @type z: [1 x #points]
+    
+    @param res: resolution of surface
+    @type res: [nx, ny]
     
     @param ax: axes object handle
-    @param q: coordinates of surface points
-      = [2 x #points] |
-    @param z: row vector of height data for surface points
-      = [1 x #points]
-    @param resolution: resolution of surface
-    @type resolution: [nx, ny]
+    
     @param kwargs: passed to contour function as given, see its help
-     
-    @return: h = handle to contourgroup object created.
+    
+    @return: h = handle to contour object created.
     """
-    # depends
-    #   vec2meshgrid, res2meshsize
     
     # input
     # axes handle missing ?
