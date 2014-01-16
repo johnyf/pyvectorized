@@ -42,13 +42,13 @@ def ezquiver(
 def contour(q, z, res, ax=None, **kwargs):
     """Vectorized wrapper for contour plot.
     
-    @param q: coordinates of surface points
+    @param q: coordinates of contour points
     @type q: [2 x #points]
     
-    @param z: row vector of height data for surface points
+    @param z: row vector of scalar function
     @type z: [1 x #points]
     
-    @param res: resolution of surface
+    @param res: resolution of contour
     @type res: [nx, ny]
     
     @param ax: axes object handle
