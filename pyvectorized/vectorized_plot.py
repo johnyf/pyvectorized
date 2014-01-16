@@ -96,28 +96,60 @@ def contour(q, z, res, ax=None, **kwargs):
     
     return cont
 
-def contourf(ax, q, z, resolution, **kwargs):
+def contourf(q, z, res, ax=None, **kwargs):
     """Vectorized filled contour plot.
+    
+    @param q: coordinates of contour points
+    @type q: [2 x #points] |
+    
+    @param z: row vector of scalar function
+    @type z: [1 x #points]
+    
+    @param res: resolution of contour
+    @type res: [nx, ny]
     
     @param ax: axes object handle
     
-    @param q: coordinates of surface points
-    @type q: [2 x #points] |
-    
-    @param z: row vector of height data for surface points
-    @type z: [1 x #points]
-    
-    @param resolution: resolution of surface
-    @type resolution: [nx, ny]
-    
-    @return: h = handle to filled contourgroup
-        object created.
+    @return: h = handle to filled contour
     """
-    #depends
-    #    vcontour
-    h = contour(ax, q, z, resolution, 'Fill', 'on',
-                 **kwargs)
-    return h
+    if ax is None:
+        ax = newax()
+    
+    # multiple axes ?
+    try:
+        contours = []
+        for curax in ax:
+            cont = contourf(curax, q, z, res, **kwargs)
+            contours.append(cont)
+        return contours
+    except:
+        pass
+    
+    # enough dimensions ?
+    ndim = q.shape[0]
+    if ndim < 2:
+        raise Exception('space dim = q.shape[0] = 1.')
+    
+    res = res2meshsize(res)
+    
+    # Z ?
+    if z is None:
+        z = np.zeros(1, q.shape[1])
+    elif z is np.NaN:
+        z = 5 * np.random.rand(1, q.shape[1])
+    else:
+        z = z * np.ones([1, q.shape[1] ])
+    
+    X, Y = vec2meshgrid(q, res) # nargout=2
+    Z, = vec2meshgrid(z, res)
+    
+    # calc
+    if ndim < 3:
+        cont = ax.contourf(X, Y, Z, 25, **kwargs)
+    else:
+        raise Exception('Dimension of vector q is not 2.')
+    
+    return cont
 
 def ezcontour(func, ax, domain, resolution,
                values, **kwargs):
