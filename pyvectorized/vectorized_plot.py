@@ -57,30 +57,44 @@ def contour(q, z, res, ax=None, **kwargs):
     
     @return: h = handle to contour object created.
     """
+    if ax is None:
+        ax = newax()
     
-    # input
-    # axes handle missing ?
-    if (0 in ax.shape):
-        ax = plt.gca()
-    resolution = res2meshsize(resolution)
+    # multiple axes ?
+    try:
+        contours = []
+        for curax in ax:
+            cont = contour(curax, q, z, res, **kwargs)
+            contours.append(cont)
+        return contours
+    except:
+        pass
+    
+    # enough dimensions ?
+    ndim = q.shape[0]
+    if ndim < 2:
+        raise Exception('space dim = q.shape[0] = 1.')
+    
+    res = res2meshsize(res)
+    
     # Z ?
-    if (0 in z.shape):
+    if z is None:
         z = np.zeros(1, q.shape[1])
+    elif z is np.NaN:
+        z = 5 * np.random.rand(1, q.shape[1])
     else:
-        if isnan(z):
-            z = 5 * np.random.rand(1, q.shape[1])
-            # random surface
-        else:
-            if isscalar(z):
-                z = z * np.ones(1, q.shape[1])
+        z = z * np.ones([1, q.shape[1] ])
+    
+    X, Y = vec2meshgrid(q, res) # nargout=2
+    Z, = vec2meshgrid(z, res)
     
     # calc
-    ndim = q.shape[0]
     if ndim < 3:
-        h = vcontour2(ax, q, z, resolution, **kwargs)
+        cont = ax.contour(X, Y, Z, 100, **kwargs)
     else:
-        raise Exception('vcontour:ndim', 'Dimension of vector q is not 2.')
-    return h
+        raise Exception('Dimension of vector q is not 2.')
+    
+    return cont
 
 def vcontour2(ax, q, z, res, varargin):
     X, Y = vec2meshgrid(q, np.array([]), res) # nargout=2
